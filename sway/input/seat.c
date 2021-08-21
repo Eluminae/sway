@@ -11,6 +11,7 @@
 #include <wlr/types/wlr_output_layout.h>
 #include <wlr/types/wlr_primary_selection.h>
 #include <wlr/types/wlr_tablet_v2.h>
+#include <wlr/types/wlr_touch.h>
 #include <wlr/types/wlr_xcursor_manager.h>
 #include "config.h"
 #include "list.h"
@@ -1556,6 +1557,24 @@ void seatop_pointer_axis(struct sway_seat *seat,
 		struct wlr_event_pointer_axis *event) {
 	if (seat->seatop_impl->pointer_axis) {
 		seat->seatop_impl->pointer_axis(seat, event);
+	}
+}
+
+void seatop_touch_motion(struct sway_seat *seat, struct wlr_event_touch_motion *event) {
+	if (seat->seatop_impl->touch_motion) {
+		seat->seatop_impl->touch_motion(seat, event);
+	}
+}
+
+void seatop_touch_up(struct sway_seat *seat, struct wlr_event_touch_up *event) {
+	if (seat->seatop_impl->touch_up) {
+		seat->seatop_impl->touch_up(seat, event);
+	}
+}
+
+void seatop_touch_down(struct sway_seat *seat, struct wlr_event_touch_down *event) {
+	if (seat->seatop_impl->touch_down) {
+		seat->seatop_impl->touch_down(seat, event);
 	}
 }
 

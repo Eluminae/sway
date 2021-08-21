@@ -258,7 +258,7 @@ static void handle_tablet_tool_tip(struct sway_seat *seat,
 
 		// Handle tapping on a container surface
 		seat_set_focus_container(seat, cont);
-		seatop_begin_down(seat, node->sway_container, time_msec, sx, sy);
+		seatop_begin_down(seat, node->sway_container, sx, sy);
 	}
 #if HAVE_XWAYLAND
 	// Handle tapping on an xwayland unmanaged view
@@ -374,7 +374,7 @@ static void handle_button(struct sway_seat *seat, uint32_t time_msec,
 			transaction_commit_dirty();
 		}
 		if (state == WLR_BUTTON_PRESSED) {
-			seatop_begin_down_on_surface(seat, surface, time_msec, sx, sy);
+			seatop_begin_down_on_surface(seat, surface, sx, sy);
 		}
 		seat_pointer_notify_button(seat, time_msec, button, state);
 		return;
@@ -486,7 +486,7 @@ static void handle_button(struct sway_seat *seat, uint32_t time_msec,
 	// Handle mousedown on a container surface
 	if (surface && cont && state == WLR_BUTTON_PRESSED) {
 		seat_set_focus_container(seat, cont);
-		seatop_begin_down(seat, cont, time_msec, sx, sy);
+		seatop_begin_down(seat, cont, sx, sy);
 		seat_pointer_notify_button(seat, time_msec, button, WLR_BUTTON_PRESSED);
 		return;
 	}
@@ -641,6 +641,16 @@ static void handle_tablet_tool_motion(struct sway_seat *seat,
 	e->previous_node = node;
 }
 
+static void handle_touch_down(struct sway_seat *seat,
+		struct wlr_event_touch_down *event) {
+	struct sway_cursor *cursor = seat->cursor;
+	struct wlr_surface *surface = NULL;
+	double sx, sy;
+	node_at_coords(seat, cursor->cursor->x, cursor->cursor->y, &surface, &sx, &sy);
+
+	seatop_begin_touch_down(seat, surface, event, sx, sy);
+}
+
 /*----------------------------------------\
  * Functions used by handle_pointer_axis  /
  *--------------------------------------*/
@@ -779,6 +789,7 @@ static const struct sway_seatop_impl seatop_impl = {
 	.pointer_axis = handle_pointer_axis,
 	.tablet_tool_tip = handle_tablet_tool_tip,
 	.tablet_tool_motion = handle_tablet_tool_motion,
+	.touch_down = handle_touch_down,
 	.rebase = handle_rebase,
 	.allow_set_cursor = true,
 };
